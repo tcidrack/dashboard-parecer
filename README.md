@@ -45,6 +45,40 @@ VITE_SUPABASE_ANON_KEY=...
 A chave `anon` é pública por design (fica no bundle do navegador). O acesso aos dados é
 controlado pelas políticas de RLS da tabela `pareceres` no Supabase.
 
+## Deploy (Vercel)
+
+O projeto está hospedado na Vercel, ligado à branch `main` deste repositório: todo push na
+`main` dispara um novo build e publica sozinho. Preset **Vite** (build `npm run build`, saída
+`dist/`) — não há `vercel.json`, os padrões já bastam.
+
+As duas variáveis do `.env` precisam existir também no painel da Vercel
+(*Settings → Environment Variables*), nos escopos Production, Preview e Development:
+
+```
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
+
+Atenção: o Vite injeta as `VITE_*` em tempo de **build**, não de runtime. Se elas faltarem, o
+site sobe e renderiza normalmente, mas nunca carrega dado nenhum — `src/lib/supabase.js` só
+registra um `console.error`. Depois de alterar uma variável é preciso **redeployar** para o
+valor novo entrar no bundle.
+
+O `base: './'` do `vite.config.js` é proposital (assets com caminho relativo) e funciona tanto
+servido da raiz do domínio quanto entregue como pasta `dist/`. Não precisa mudar.
+
+### Sobre a exposição dos dados
+
+A URL de produção é **pública** — não há tela de login. A tabela `pareceres` é legível pela
+chave `anon`, o que inclui colunas de nível individual (`cid`, `idade_paciente`,
+`data_internacao`, `data_alta`, `numero_susfacil`, `numero_laudo`, `numero_conta`). Isso é uma
+decisão consciente, não descuido: o painel foi feito para apresentação ao cliente.
+
+A escrita, essa sim, está fechada — a role `anon` tem apenas `SELECT` na tabela, com RLS
+habilitado. Se um dia a exposição da leitura incomodar, os dois caminhos são proteger a URL
+por senha (exige plano Pro da Vercel) ou publicar uma view agregada, sem CID, idade e IDs de
+conta.
+
 ## Personalização
 
 - **Título/logo**: em `src/App.jsx` (header) e `index.html` (`<title>`).
