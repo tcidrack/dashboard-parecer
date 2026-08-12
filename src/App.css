@@ -1,0 +1,585 @@
+/* ===== BASE ===== */
+.container {
+  min-height: 100vh;
+  padding: 24px;
+  transition: background-color 0.4s;
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.acoes-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-area img {
+  height: 40px;
+  cursor: pointer;
+}
+
+.logo-area h1 {
+  color: #fff;
+  font-size: 22px;
+  margin: 0;
+}
+
+/* ===== ABAS ===== */
+.abas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.aba-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tema-claro .aba-btn {
+  background: #1E2939;
+  color: #aaa;
+}
+
+.tema-escuro .aba-btn {
+  background: #1E293B;
+  color: #aaa;
+}
+
+.tema-claro .aba-btn.ativa {
+  background: #FF0073;
+  color: #fff;
+}
+
+.tema-escuro .aba-btn.ativa {
+  background: #FFCB05;
+  color: #1E2939;
+}
+
+.tema-claro .aba-btn:not(.ativa):hover {
+  background: #2a3a4d;
+  color: #fff;
+}
+
+.tema-escuro .aba-btn:not(.ativa):hover {
+  background: #2a3a4d;
+  color: #fff;
+}
+
+/* ===== MATERIAL ICONS ===== */
+.material-symbols-outlined {
+  font-size: 20px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+/* ===== BTN TEMA ===== */
+.btn-tema {
+  display: inline-flex;
+  align-items: center;
+  background: #1E2939;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 14px;
+}
+
+.tema-claro .btn-tema:hover {
+  background: #FF0073;
+}
+
+.tema-escuro .btn-tema:hover {
+  background: #FFCB05;
+  color: #1E2939;
+}
+
+/* ===== CARDS ===== */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 220px;
+  cursor: default;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.graficos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.graficos-grid .animated-card {
+  margin-bottom: 0;
+}
+
+.animated-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.animated-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.animated-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -35%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at top right, #FF0073, transparent 50%);
+  transform: rotate(5deg);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.tema-escuro .animated-card::before {
+  background: radial-gradient(circle at top right, #FFCB05, transparent 50%);
+}
+
+.animated-card:hover::before {
+  opacity: 1;
+}
+
+.animated-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.animated-card p {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+/* ===== FILTROS ===== */
+.filtro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.filtro label {
+  color: #fff;
+  font-weight: bold;
+}
+
+.filtro-processo {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  margin-right: 8px;
+  min-width: 140px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filtro select,
+.filtro input[type="date"] {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  margin-right: 8px;
+  min-width: 140px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.filtro-data {
+  padding: 8px;
+  border-radius: 6px;
+  border-style: none;
+}
+
+.ate-text {
+  text-align: center;
+  margin-right: 8px;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* ===== TABELA ===== */
+.tabela-container {
+  border-radius: 12px;
+  padding: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tema-claro thead {
+  background: #929AA3;
+}
+
+.tema-escuro thead {
+  background: #18212F;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  padding: 12px 10px;
+  text-align: center;
+  z-index: 20;
+  font-size: 13px;
+}
+
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid rgba(128,128,128,0.2);
+  color: inherit;
+  font-size: 13px;
+}
+
+.tema-escuro tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.tema-claro tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tabela-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tabela-container::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.tema-claro .tabela-container::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 10px;
+}
+
+.tema-escuro .tabela-container::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 10px;
+}
+
+.tema-claro .tabela-container::-webkit-scrollbar-thumb:hover {
+  background: #FF0073;
+}
+
+.tema-escuro .tabela-container::-webkit-scrollbar-thumb:hover {
+  background: #FFCB05;
+}
+
+/* ===== AÇÕES TABELA ===== */
+.acoes-tabela {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0 0;
+}
+
+/* ===== BADGE TIPO ===== */
+.badge-rm {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #1a4fa0;
+  color: #90c4ff;
+}
+
+.badge-tc {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #7a2020;
+  color: #ffaaaa;
+}
+
+.tema-claro .badge-rm {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.tema-claro .badge-tc {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===== LINHA FILTROS ===== */
+.linha-filtros {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Agrupa label + campo para nunca quebrarem separados */
+.grupo-filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 826px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 36px;
+  }
+
+  .btn-tema-toggle {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 13px;
+  }
+
+  .logo-area h1 {
+    font-size: 16px;
+    text-align: center;
+    margin-top: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .linha-filtros {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .linha-filtros label {
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .grupo-filtro {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .grupo-filtro input,
+  .grupo-filtro select {
+    flex: 1;
+    min-width: 120px;
+    max-width: 100%;
+  }
+
+  .linha-filtros > .btn-tema {
+    width: 100%;
+  }
+
+  .ate-text {
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .acoes-tabela {
+    flex-direction: column;
+  }
+
+  .acoes-tabela button {
+    width: 100%;
+  }
+
+  .abas {
+    gap: 6px;
+  }
+
+  .aba-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+/* ===== PAGINAÇÃO ===== */
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.paginacao-btn {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 12px;
+  transition: opacity 0.2s;
+}
+
+.paginacao-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.paginacao-ativa {
+  font-weight: 700;
+}
+
+/* ===== APRESENTAÇÃO (dashboard do cliente) ===== */
+
+/* Banner de introdução / "como ler" */
+.intro-banner {
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
+}
+
+.intro-banner h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.intro-banner p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.92;
+}
+
+/* Cabeçalho explicativo de cada seção (sobre o fundo) */
+.secao {
+  margin: 28px 0 4px;
+}
+
+.secao h2 {
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+
+.secao p {
+  font-size: 13px;
+  margin: 0;
+  opacity: 0.85;
+  max-width: 900px;
+}
+
+/* Legenda curta abaixo do título de um gráfico */
+.grafico-legenda {
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  opacity: 0.8;
+  margin: -2px 0 10px !important;
+  max-width: 640px;
+}
+
+/* Glossário no rodapé */
+.glossario {
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-top: 28px;
+}
+
+.glossario h2 {
+  font-size: 18px;
+  margin: 0 0 14px;
+}
+
+.glossario dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+}
+
+.glossario dt {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.glossario dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.88;
+}
+
+/* Rodapé */
+.rodape {
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.85;
+  margin: 28px 0 8px;
+}
