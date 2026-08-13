@@ -10,6 +10,7 @@ import {
   num, formatarMoedaBR, formatarMoedaCompactaBR, formatarPercentualBR,
 } from "../lib/formatUtils";
 import { usePollingFetch } from "../hooks/usePollingFetch";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 // Teto de linhas por consulta. Indicadores, gráficos e tabela saem todos desse
 // mesmo conjunto, então é ele que define o alcance do painel.
@@ -137,6 +138,10 @@ export default function Pareceres({ tema, cores }) {
   const [tiposCompra, setTiposCompra] = useState([]);
   const ITENS_POR_PAGINA = 20;
   const [pagina, setPagina] = useState(1);
+
+  // Eixos, raios e rótulos do Recharts são props em pixel — CSS não os alcança.
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const alturaGrafico = isMobile ? 240 : 280;
 
   const accentColor = tema === "escuro" ? "#FFCB05" : "#FF0073";
   const corSecundaria = tema === "escuro" ? "#60A5FA" : "#0070FF";
@@ -283,10 +288,17 @@ export default function Pareceres({ tema, cores }) {
     return [...grupos.values()].sort((a, b) => b.cobrado - a.cobrado);
   }, [dados]);
 
-  const graficosRanking = useMemo(() => [
-    { titulo: "por CID (Top 10)", dados: agruparPor(dados, "cid", metrica).slice(0, 10), altura: 300, yWidth: 240, maxNome: 35 },
-    { titulo: "por Prestador (Top 10)", dados: agruparPor(dados, "prestador", metrica).slice(0, 10), altura: 300, yWidth: 240, maxNome: 35 },
-  ], [dados, metrica]);
+  // No mobile o eixo de rótulos precisa ceder espaço: com 240px de largura num
+  // gráfico de ~320px não sobraria praticamente nada para as barras.
+  const graficosRanking = useMemo(() => {
+    const altura = isMobile ? 320 : 300;
+    const yWidth = isMobile ? 96 : 240;
+    const maxNome = isMobile ? 14 : 35;
+    return [
+      { titulo: "por CID (Top 10)", dados: agruparPor(dados, "cid", metrica).slice(0, 10), altura, yWidth, maxNome },
+      { titulo: "por Prestador (Top 10)", dados: agruparPor(dados, "prestador", metrica).slice(0, 10), altura, yWidth, maxNome },
+    ];
+  }, [dados, metrica, isMobile]);
 
   const totalPaginas = Math.ceil(filtrados.length / ITENS_POR_PAGINA);
   const paginaSegura = Math.min(Math.max(1, pagina), Math.max(1, totalPaginas));
@@ -452,11 +464,16 @@ export default function Pareceres({ tema, cores }) {
           <p className="grafico-legenda" style={{ color: cores.texto }}>
             Barras comparam o valor cobrado e o liberado a cada mês; a linha roxa mostra a glosa do período.
           </p>
-          <div style={{ width: "100%", height: 280 }}>
+          <div style={{ width: "100%", height: alturaGrafico }}>
             <ResponsiveContainer>
               <ComposedChart data={chartMensal}>
                 <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.15} vertical={false} />
-                <XAxis dataKey="mes" stroke={cores.texto} tick={{ fontSize: 11 }} />
+                <XAxis
+                  dataKey="mes"
+                  stroke={cores.texto}
+                  tick={{ fontSize: 11 }}
+                  interval={isMobile ? "preserveStartEnd" : "preserveEnd"}
+                />
                 <YAxis stroke={cores.texto} tick={{ fontSize: 11 }} tickFormatter={formatarMoedaCompactaBR} />
                 <Tooltip contentStyle={{ fontSize: 12 }} formatter={(v) => formatarMoedaBR(v)} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -478,18 +495,20 @@ export default function Pareceres({ tema, cores }) {
               <p className="grafico-legenda" style={{ color: cores.texto }}>
                 Fatia de cada tipo de compra no total de glosa — evidencia onde estão as maiores perdas.
               </p>
-              <div style={{ width: "100%", height: 280 }}>
+              <div style={{ width: "100%", height: alturaGrafico }}>
                 <ResponsiveContainer>
                   <PieChart>
+                    {/* No mobile os rótulos externos só seriam cortados — a legenda
+                        e o tooltip já nomeiam as fatias. */}
                     <Pie
                       data={composicaoTipoCompra}
                       dataKey="valor"
                       nameKey="nome"
-                      innerRadius={60}
-                      outerRadius={90}
+                      innerRadius={isMobile ? 45 : 60}
+                      outerRadius={isMobile ? 70 : 90}
                       paddingAngle={2}
-                      label={renderRotuloRosca}
-                      labelLine={{ stroke: cores.texto, strokeOpacity: 0.4 }}
+                      label={isMobile ? false : renderRotuloRosca}
+                      labelLine={isMobile ? false : { stroke: cores.texto, strokeOpacity: 0.4 }}
                     >
                       {composicaoTipoCompra.map((f, i) => (
                         <Cell key={f.nome} fill={PALETA[i % PALETA.length]} stroke={cores.card} strokeWidth={2} />
@@ -514,11 +533,21 @@ export default function Pareceres({ tema, cores }) {
               <p className="grafico-legenda" style={{ color: cores.texto }}>
                 Compara cobrado e liberado em cada macrorregião — a diferença entre as barras é a glosa.
               </p>
-              <div style={{ width: "100%", height: 280 }}>
+              <div style={{ width: "100%", height: alturaGrafico }}>
                 <ResponsiveContainer>
                   <BarChart data={macroCobradoLiberado}>
                     <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.15} vertical={false} />
-                    <XAxis dataKey="nome" stroke={cores.texto} tick={{ fontSize: 11 }} />
+                    {/* Nomes de macrorregião se sobrepõem no mobile: trunca e inclina */}
+                    <XAxis
+                      dataKey="nome"
+                      stroke={cores.texto}
+                      tick={{ fontSize: isMobile ? 10 : 11 }}
+                      tickFormatter={isMobile ? (v) => truncar(v, 8) : undefined}
+                      interval={isMobile ? 0 : "preserveEnd"}
+                      angle={isMobile ? -35 : 0}
+                      textAnchor={isMobile ? "end" : "middle"}
+                      height={isMobile ? 64 : 30}
+                    />
                     <YAxis stroke={cores.texto} tick={{ fontSize: 11 }} tickFormatter={formatarMoedaCompactaBR} />
                     <Tooltip contentStyle={{ fontSize: 12 }} formatter={(v) => formatarMoedaBR(v)} />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -658,14 +687,14 @@ export default function Pareceres({ tema, cores }) {
 
       {/* TABELA */}
       <div className="tabela-container" style={{ backgroundColor: cores.card, color: cores.texto, marginTop: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid rgba(128,128,128,0.2)" }}>
+        <div className="tabela-cabecalho">
           <h3 style={{ margin: 0 }}>Detalhamento</h3>
           <span style={{ fontSize: "13px", opacity: 0.8 }}>
             Mostrando {filtrados.length === 0 ? 0 : inicio + 1}—{Math.min(inicio + ITENS_POR_PAGINA, filtrados.length)} de {filtrados.length.toLocaleString("pt-BR")}
           </span>
         </div>
-        <div style={{ overflowX: "auto" }}>
-          <table>
+        <div className="tabela-scroll">
+          <table className="tabela-detalhe">
             <thead>
               <tr>
                 <th style={{ color: cores.texto }}>Nº Ofício</th>
