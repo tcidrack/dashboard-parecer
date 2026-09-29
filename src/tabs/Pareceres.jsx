@@ -50,10 +50,11 @@ function formatarDataHora(iso) {
   );
 }
 
-// Dashboard de apresentação: abre no mês corrente (não só "hoje") para já mostrar dados.
-// Deriva de dataHojeBR() ("YYYY-MM-DD") para manter o fuso de São Paulo.
-function primeiroDiaDoMesBR() {
-  return dataHojeBR().slice(0, 8) + "01";
+// Sem período escolhido, o painel mostra a produção do dia.
+function inicioDoDiaISO() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString();
 }
 
 // Cabeçalho explicativo de seção — texto de apresentação, sem lógica.
@@ -127,7 +128,7 @@ function truncar(s, max) {
 
 export default function Pareceres({ tema, cores }) {
   const [busca, setBusca] = useState("");
-  const [dataInicio, setDataInicio] = useState(primeiroDiaDoMesBR);
+  const [dataInicio, setDataInicio] = useState(dataHojeBR);
   const [dataFim, setDataFim] = useState("");
   const [filtroPrestador, setFiltroPrestador] = useState("");
   const [filtroMacro, setFiltroMacro] = useState("");
@@ -158,6 +159,8 @@ export default function Pareceres({ tema, cores }) {
       .order("created_at", { ascending: false });
     if (dataInicio) {
       q = q.gte("created_at", dataInicio);
+    } else if (!dataFim) {
+      q = q.gte("created_at", inicioDoDiaISO());
     }
     if (dataFim) q = q.lte("created_at", dataFim + "T23:59:59");
     if (filtroPrestador) q = q.eq("prestador", filtroPrestador);
@@ -393,7 +396,7 @@ export default function Pareceres({ tema, cores }) {
       {/* INDICADORES */}
       <SecaoTitulo
         titulo="Indicadores do período"
-        descricao="Resumo consolidado das contas auditadas. Ao limpar os filtros, os cards mostram o total geral (toda a base); com filtros aplicados, refletem o recorte selecionado."
+        descricao="Resumo consolidado das contas auditadas. Por padrão, os cards mostram a produção de hoje; escolha um período nos filtros para ver outros dias."
         cor="#fff"
       />
 
