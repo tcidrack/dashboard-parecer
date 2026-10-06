@@ -71,7 +71,7 @@ servido da raiz do domínio quanto entregue como pasta `dist/`. Não precisa mud
 
 A URL de produção é **pública** — não há tela de login. A tabela `pareceres` é legível pela
 chave `anon`, o que inclui colunas de nível individual (`cid`, `idade_paciente`,
-`data_internacao`, `data_alta`, `numero_susfacil`, `numero_laudo`, `numero_conta`). Isso é uma
+`data_internacao`, `data_alta`, `numero_susfacil`, `numero_laudo`, `numero_conta`, `numero_processo`). Isso é uma
 decisão consciente, não descuido: o painel foi feito para apresentação ao cliente.
 
 A escrita, essa sim, está fechada — a role `anon` tem apenas `SELECT` na tabela, com RLS

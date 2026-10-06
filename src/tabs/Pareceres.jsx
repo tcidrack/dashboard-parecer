@@ -155,7 +155,7 @@ export default function Pareceres({ tema, cores }) {
   const fetchPareceres = useCallback(async (signal) => {
     let q = supabase
       .from("pareceres")
-      .select("id, created_at, numero_oficio, data_parecer, numero_conta, prestador, macrorregiao, tipo_compra, cid, dias_internacao, valor_cobrado, valor_liberado, valor_glosa, percentual_glosa, custo_por_dia")
+      .select("id, created_at, numero_oficio, numero_processo, data_parecer, numero_conta, prestador, macrorregiao, tipo_compra, cid, dias_internacao, valor_cobrado, valor_liberado, valor_glosa, percentual_glosa, custo_por_dia")
       .order("created_at", { ascending: false });
     if (dataInicio) {
       q = q.gte("created_at", dataInicio);
@@ -226,6 +226,7 @@ export default function Pareceres({ tema, cores }) {
     const termo = busca.trim().toLowerCase();
     filtrados = filtrados.filter((r) =>
       (r.numero_oficio || "").toLowerCase().includes(termo) ||
+      (r.numero_processo || "").toLowerCase().includes(termo) ||
       (r.numero_conta || "").toLowerCase().includes(termo) ||
       (r.prestador || "").toLowerCase().includes(termo)
     );
@@ -354,9 +355,10 @@ export default function Pareceres({ tema, cores }) {
       ["", "", "", "Glosa", Number(kpis.glosa.toFixed(2))],
       ["", "", "", "% glosado", kpis.pctGlosa != null ? Number(kpis.pctGlosa.toFixed(2)) : "—"],
       [],
-      ["Nº Ofício", "Data Parecer", "Processado em", "Nº Conta", "Prestador", "Macrorregião", "Tipo Compra", "CID", "Dias Intern.", "V. Cobrado", "V. Liberado", "Glosa", "% Glosa"],
+      ["Nº Ofício", "Nº Processo", "Data Parecer", "Processado em", "Nº Conta", "Prestador", "Macrorregião", "Tipo Compra", "CID", "Dias Intern.", "V. Cobrado", "V. Liberado", "Glosa", "% Glosa"],
       ...filtrados.map((r) => [
         r.numero_oficio || "—",
+        r.numero_processo || "—",
         formatarDataBR(r.data_parecer),
         formatarDataHora(r.created_at),
         r.numero_conta || "—",
@@ -621,7 +623,7 @@ export default function Pareceres({ tema, cores }) {
             <input
               className="filtro-processo"
               type="text"
-              placeholder="Ofício, conta ou prestador"
+              placeholder="Ofício, processo, conta ou prestador"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
@@ -701,6 +703,7 @@ export default function Pareceres({ tema, cores }) {
             <thead>
               <tr>
                 <th style={{ color: cores.texto }}>Nº Ofício</th>
+                <th style={{ color: cores.texto }}>Nº Processo</th>
                 <th style={{ color: cores.texto }}>Data Parecer</th>
                 <th style={{ color: cores.texto }}>Processado em</th>
                 <th style={{ color: cores.texto }}>Nº Conta</th>
@@ -717,12 +720,13 @@ export default function Pareceres({ tema, cores }) {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={13} style={{ color: cores.texto, padding: 32 }}>Carregando...</td></tr>
+                <tr><td colSpan={14} style={{ color: cores.texto, padding: 32 }}>Carregando...</td></tr>
               ) : filtrados.length === 0 ? (
-                <tr><td colSpan={13} style={{ color: cores.texto, padding: 32 }}>Nenhum registro encontrado.</td></tr>
+                <tr><td colSpan={14} style={{ color: cores.texto, padding: 32 }}>Nenhum registro encontrado.</td></tr>
               ) : paginaDados.map((r) => (
                 <tr key={r.id}>
                   <td style={{ color: cores.texto }}>{r.numero_oficio || "—"}</td>
+                  <td style={{ color: cores.texto }}>{r.numero_processo || "—"}</td>
                   <td style={{ color: cores.texto }}>{formatarDataBR(r.data_parecer)}</td>
                   <td style={{ color: cores.texto }}>{formatarDataHora(r.created_at)}</td>
                   <td style={{ color: cores.texto }}>{r.numero_conta || "—"}</td>
