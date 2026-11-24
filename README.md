@@ -84,6 +84,7 @@ conta.
 - **Título/logo**: em `src/App.jsx` (header) e `index.html` (`<title>`).
 - **Período inicial**: abre na produção do dia (`dataHojeBR` em `src/tabs/Pareceres.jsx`).
   Limpar os filtros faz os cards mostrarem o total geral de toda a base. A busca (ofício,
-  processo, conta, prestador) sempre procura na base inteira, ignorando o período.
+  processo, conta, prestador) procura dentro do período filtrado; para buscar em todos
+  os dias, limpe as datas. O Excel exportado traz exatamente o que o filtro mostra.
 - **Textos explicativos**: banner de introdução e glossário em `src/App.jsx`; legendas dos
   gráficos em `src/tabs/Pareceres.jsx`.
