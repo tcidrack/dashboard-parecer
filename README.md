@@ -82,7 +82,8 @@ conta.
 ## Personalização
 
 - **Título/logo**: em `src/App.jsx` (header) e `index.html` (`<title>`).
-- **Período inicial**: abre no mês corrente (`primeiroDiaDoMesBR` em `src/tabs/Pareceres.jsx`).
-  Limpar os filtros faz os cards mostrarem o total geral de toda a base.
+- **Período inicial**: abre na produção do dia (`dataHojeBR` em `src/tabs/Pareceres.jsx`).
+  Limpar os filtros faz os cards mostrarem o total geral de toda a base. A busca (ofício,
+  processo, conta, prestador) sempre procura na base inteira, ignorando o período.
 - **Textos explicativos**: banner de introdução e glossário em `src/App.jsx`; legendas dos
   gráficos em `src/tabs/Pareceres.jsx`.

@@ -50,11 +50,14 @@ function formatarDataHora(iso) {
   );
 }
 
-// Sem período escolhido, o painel mostra a produção do dia.
-function inicioDoDiaISO() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString();
+// As datas do filtro são dias de Brasília; sem o offset o Postgres as lê como
+// UTC e o recorte escorrega 3h nas pontas.
+const OFFSET_BR = "-03:00";
+
+// Termo da busca vai entre aspas no or() do PostgREST: o número do processo
+// tem "/", "." e "-", e vírgula/parêntese quebrariam a sintaxe do filtro.
+function termoPostgrest(t) {
+  return `"*${t.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}*"`;
 }
 
 // Cabeçalho explicativo de seção — texto de apresentação, sem lógica.
@@ -128,6 +131,7 @@ function truncar(s, max) {
 
 export default function Pareceres({ tema, cores }) {
   const [busca, setBusca] = useState("");
+  const [buscaDebounced, setBuscaDebounced] = useState("");
   const [dataInicio, setDataInicio] = useState(dataHojeBR);
   const [dataFim, setDataFim] = useState("");
   const [filtroPrestador, setFiltroPrestador] = useState("");
@@ -152,17 +156,28 @@ export default function Pareceres({ tema, cores }) {
     ? ["#60A5FA", "#FFCB05", "#C4B5FD", "#34D399", "#FB923C"]
     : ["#0070FF", "#FF0073", "#7C3AED", "#00876C", "#B45309"];
 
+  // Busca vai ao servidor só depois de uma pausa na digitação
+  useEffect(() => {
+    const t = setTimeout(() => setBuscaDebounced(busca.trim()), 300);
+    return () => clearTimeout(t);
+  }, [busca]);
+
   const fetchPareceres = useCallback(async (signal) => {
     let q = supabase
       .from("pareceres")
       .select("id, created_at, numero_oficio, numero_processo, data_parecer, numero_conta, prestador, macrorregiao, tipo_compra, cid, dias_internacao, valor_cobrado, valor_liberado, valor_glosa, percentual_glosa, custo_por_dia")
       .order("created_at", { ascending: false });
-    if (dataInicio) {
-      q = q.gte("created_at", dataInicio);
-    } else if (!dataFim) {
-      q = q.gte("created_at", inicioDoDiaISO());
+    if (buscaDebounced) {
+      // Quem busca um processo específico quer achá-lo em qualquer dia:
+      // a busca percorre a base toda e ignora o período.
+      const t = termoPostgrest(buscaDebounced);
+      q = q.or(
+        `numero_processo.ilike.${t},numero_oficio.ilike.${t},numero_conta.ilike.${t},prestador.ilike.${t}`
+      );
+    } else {
+      if (dataInicio) q = q.gte("created_at", `${dataInicio}T00:00:00${OFFSET_BR}`);
+      if (dataFim) q = q.lte("created_at", `${dataFim}T23:59:59.999${OFFSET_BR}`);
     }
-    if (dataFim) q = q.lte("created_at", dataFim + "T23:59:59");
     if (filtroPrestador) q = q.eq("prestador", filtroPrestador);
     if (filtroMacro) q = q.eq("macrorregiao", filtroMacro);
     if (filtroTipoCompra) q = q.eq("tipo_compra", filtroTipoCompra);
@@ -176,12 +191,12 @@ export default function Pareceres({ tema, cores }) {
       return [];
     }
     return data || [];
-  }, [dataInicio, dataFim, filtroPrestador, filtroMacro, filtroTipoCompra]);
+  }, [buscaDebounced, dataInicio, dataFim, filtroPrestador, filtroMacro, filtroTipoCompra]);
 
   const { data: dados, loading } = usePollingFetch(
     fetchPareceres,
     120000,
-    [dataInicio, dataFim, filtroPrestador, filtroMacro, filtroTipoCompra]
+    [buscaDebounced, dataInicio, dataFim, filtroPrestador, filtroMacro, filtroTipoCompra]
   );
 
   // KPIs derivados das mesmas linhas que alimentam tabela e gráficos — uma só
@@ -694,6 +709,11 @@ export default function Pareceres({ tema, cores }) {
       <div className="tabela-container" style={{ backgroundColor: cores.card, color: cores.texto, marginTop: "20px" }}>
         <div className="tabela-cabecalho">
           <h3 style={{ margin: 0 }}>Detalhamento</h3>
+          {busca.trim() && (
+            <span style={{ fontSize: "13px", opacity: 0.8 }}>
+              Buscando em toda a base — o período é ignorado
+            </span>
+          )}
           <span style={{ fontSize: "13px", opacity: 0.8 }}>
             Mostrando {filtrados.length === 0 ? 0 : inicio + 1}—{Math.min(inicio + ITENS_POR_PAGINA, filtrados.length)} de {filtrados.length.toLocaleString("pt-BR")}
           </span>
